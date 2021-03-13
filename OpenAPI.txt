@@ -1,0 +1,240 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://petstore.swagger.io/v2'
+    variables: {}
+info:
+  description: >-
+    :dog: :cat: :rabbit: This is a sample server Petstore server.  You can find
+    out more about Swagger at [http://swagger.io](http://swagger.io) or on
+    [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you
+    can use the api key `special-key` to test the authorization filters.
+  version: 1.0.0
+  title: Swagger Petstore
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags: []
+paths:
+  /leaderboard:
+    get:
+      summary: Gets leaderboard
+      description: ''
+      parameters: []
+      operationId: ''
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                - User
+      security: []
+  /user:
+    get:
+      summary: Gets user and lists and items and everything
+      description: ''
+      parameters: []
+      operationId: ''
+      responses:
+        default:
+          description: Default response
+    post:
+      summary: Register
+      description: ''
+      parameters: []
+      operationId: ''
+      responses:
+        default:
+          description: Default response
+  /list:
+    post:
+      summary: Create a new shopping list
+      description: ''
+      parameters: []
+      operationId: ''
+      responses:
+        default:
+          description: Default response
+  '/list/{list_id}/item':
+    post:
+      summary: Create new item
+      description: happens when barcode is scanned
+      parameters: []
+      operationId: ''
+      responses:
+        default:
+          description: Default response
+externalDocs:
+  description: See AsyncAPI example
+  url: 'https://mermade.github.io/shins/asyncapi.html'
+components:
+  schemas:
+    User:
+      lists:
+        - ShoppingList
+      username: string
+      password: string
+    ShoppingList:
+      numItems: int
+      bought:
+        - Item
+      completetionTime: int
+      id: int
+    Item:
+      barcode: int
+      time: int
+  requestBodies:
+    Pet:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - photoUrls
+            properties:
+              id:
+                type: integer
+                format: int64
+              category:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  name:
+                    type: string
+                xml:
+                  name: Category
+              name:
+                type: string
+                example: doggie
+              photoUrls:
+                type: array
+                xml:
+                  name: photoUrl
+                  wrapped: true
+                items:
+                  type: string
+              tags:
+                type: array
+                xml:
+                  name: tag
+                  wrapped: true
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                    name:
+                      type: string
+                  xml:
+                    name: Tag
+              status:
+                type: string
+                description: pet status in the store
+                enum:
+                  - available
+                  - pending
+                  - sold
+            xml:
+              name: Pet
+        application/xml:
+          schema:
+            type: object
+            required:
+              - name
+              - photoUrls
+            properties:
+              id:
+                type: integer
+                format: int64
+              category:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  name:
+                    type: string
+                xml:
+                  name: Category
+              name:
+                type: string
+                example: doggie
+              photoUrls:
+                type: array
+                xml:
+                  name: photoUrl
+                  wrapped: true
+                items:
+                  type: string
+              tags:
+                type: array
+                xml:
+                  name: tag
+                  wrapped: true
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                    name:
+                      type: string
+                  xml:
+                    name: Tag
+              status:
+                type: string
+                description: pet status in the store
+                enum:
+                  - available
+                  - pending
+                  - sold
+            xml:
+              name: Pet
+      description: Pet object that needs to be added to the store
+      required: true
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                username:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+                userStatus:
+                  type: integer
+                  format: int32
+                  description: User Status
+              xml:
+                name: User
+      description: List of user object
+      required: true
+  securitySchemes:
+    password:
+      type: http
+      scheme: ''
+  links: {}
+  callbacks: {}
+security:
+  - password: []
