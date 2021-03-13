@@ -1,5 +1,7 @@
-from typing import List
+from typing import List, Optional
 from . import Base
+from pydantic import BaseModel
+
 
 from sqlalchemy import (
     Column,
@@ -9,11 +11,24 @@ from sqlalchemy import (
     DateTime,
     create_engine,
     ForeignKey,
-    UniqueConstraint,
-    relationship
+    UniqueConstraint
 )
+from sqlalchemy.orm import relationship, backref
 
+class UserResp(BaseModel):
+    
+    username : str
+    password : str
 
+class ShoppingListResp(BaseModel):
+    numItems : int
+    completionTime : Optional[int]
+    listId : int
+
+class ItemResp(BaseModel):
+    barcode : int
+    itemId : int
+    
 class User(Base):
     __tablename__ = "Users"
     shopping_list = relationship("ShoppingList")
@@ -33,7 +48,8 @@ class ShoppingList(Base):
     numItems = Column(Integer)
     bought = relationship("Item")
     completionTime = Column(Integer)
-    listId = Column(Integer, ForeignKey('Users.shopping_list'), primary_key=True)
+    listId = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('Users.username'), primary_key=True)
 
 
     def dict(self):
@@ -49,7 +65,9 @@ class Item(Base):
     barcode = Column(Integer)
     #is time needed here?
     time = Column(Integer)
-    itemId = Column(Integer, ForeignKey('ShoppingList.listId'), primary_key=True)
+    itemId = Column(Integer, primary_key=True)
+    shoppingListId = Column(Integer, ForeignKey('ShoppingList.listId'), primary_key=True)
+    user = Column(Integer, ForeignKey('Users.username'), primary_key=True)
     def __repr__(self):
         return {
             "barcode": self.barcode,

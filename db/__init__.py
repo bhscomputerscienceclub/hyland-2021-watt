@@ -9,7 +9,7 @@ import config
 Base = declarative_base()
 engine = create_engine(config.SQL_URL, echo=False)  # TODO: echo enable on debug
 
-from .shopping import User
+from .shopping import User, ShoppingList, Item, UserResp, ShoppingListResp, ItemResp
 
 # import all tables
 
