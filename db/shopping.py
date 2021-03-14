@@ -26,7 +26,7 @@ class ShoppingListResp(BaseModel):
     listId : int
 
 class ItemResp(BaseModel):
-    barcode : int
+    barcode : str
     itemId : int
     
 class User(Base):
@@ -67,7 +67,7 @@ class ShoppingList(Base):
 
 class Item(Base):
     __tablename__ = "item"
-    barcode = Column(Integer)
+    barcode = Column(String)
     #is time needed here?
     time = Column(Integer)
     itemId = Column(Integer, primary_key=True)
