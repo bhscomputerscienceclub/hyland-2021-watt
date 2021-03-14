@@ -67,6 +67,13 @@ def read_item(shopping: ItemResp, shoppingListId: int, username: str = Depends(g
     )
     session = Session()
     session.add(anItem)
+    ls = session.query(ShoppingList).filter(ShoppingList.listId == anItem.shoppingListId).first()
+    if len(ls.bought) == 1:
+        ls.startTime = time.time()
+    
+    if len(ls.bought) == ls.numItems:
+        ls.completionTime = time.time()
+        ls.differenceTime = ls.completionTime - ls.startTime
     session.commit()
     session.close()
     return
@@ -95,6 +102,7 @@ def read_items(itemId: int):
     session = Session()
     itemInfo = session.query(Item).filter(Item.itemId == itemId).all()
     session.close()
+
     return itemInfo
 
 @app.get("/leaderboard")
@@ -104,14 +112,17 @@ def leaderboard():
     listOfNames = []
     listOfTimes = []
     orderedList = []
+    orderedTimes = []
     for x in leaderBoardInfo:
         listOfNames.append(x.user)
-        listOfTimes.append(x.completionTime)
+        listOfTimes.append(x.differenceTime)
         numberOfTimes = len(listOfTimes)
     for i in range(0, numberOfTimes):
         minimumIndex = listOfTimes.index(min(listOfTimes))
+        orderedTimes.append(listOfTimes[minimumIndex])
         listOfTimes.pop(minimumIndex)
         orderedList.append(listOfNames[minimumIndex])
+        
         listOfNames.pop(minimumIndex)
         
     session.close()

@@ -22,7 +22,7 @@ class UserResp(BaseModel):
 
 class ShoppingListResp(BaseModel):
     numItems : int
-    completionTime : Optional[int]
+
     listId : int
 
 class ItemResp(BaseModel):
@@ -47,8 +47,12 @@ class ShoppingList(Base):
     __tablename__ = "ShoppingList"
     numItems = Column(Integer)
     bought = relationship("Item")
-    
+    #updates with first item
+    startTime = Column(Integer)
+    #updates with last item
     completionTime = Column(Integer)
+    #calculated at end
+    differenceTime = Column(Integer)
     listId = Column(Integer, primary_key=True)
     user = Column(Integer, ForeignKey('Users.username'), primary_key=True)
 
