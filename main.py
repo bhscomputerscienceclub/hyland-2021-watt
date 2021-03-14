@@ -1,6 +1,6 @@
 from db import Session, User, ShoppingList, Item, UserResp, ShoppingListResp, ItemResp
 import random
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, status
 from db import (
     Session,
@@ -91,21 +91,21 @@ def read_item(shopping: UserResp):
     return
 
 @app.get("/users/shoppinglists")
-def read_list(shopListId: int):
+def read_list(shopListId: int, username : str = Depends(get_current_username)):
     session = Session()
-    listinfo = session.query(ShoppingList).filter(ShoppingList.listId == shopListId).all()
+    listinfo = session.query(ShoppingList).filter(ShoppingList.user == username).filter(ShoppingList.listId == shopListId).all()
     session.close()
     return listinfo
 
 @app.get("/users/shoppinglists/{shoppingListId}/items")
-def read_items(itemId: int):
+def read_items(shoppingListId: int, username : str = Depends(get_current_username)):
     session = Session()
-    itemInfo = session.query(Item).filter(Item.itemId == itemId).all()
+    itemInfo = session.query(Item).filter(Item.user == username).filter(Item.shoppingListId == shoppingListId).all()
     session.close()
 
     return itemInfo
 
-@app.get("/leaderboard")
+@app.get("/leaderboard", response_model = List[Tuple[str, int]])
 def leaderboard():
     session = Session()
     leaderBoardInfo = session.query(ShoppingList).all()
@@ -113,17 +113,14 @@ def leaderboard():
     listOfTimes = []
     orderedList = []
     orderedTimes = []
+    print(leaderBoardInfo)
     for x in leaderBoardInfo:
-        listOfNames.append(x.user)
-        listOfTimes.append(x.differenceTime)
+        if x.differenceTime is not None:    
+            listOfNames.append(x.user)
+            listOfTimes.append(x.differenceTime)
         numberOfTimes = len(listOfTimes)
-    for i in range(0, numberOfTimes):
-        minimumIndex = listOfTimes.index(min(listOfTimes))
-        orderedTimes.append(listOfTimes[minimumIndex])
-        listOfTimes.pop(minimumIndex)
-        orderedList.append(listOfNames[minimumIndex])
+    orderedList = sorted(zip(listOfNames, listOfTimes), key = lambda x: x[1])
         
-        listOfNames.pop(minimumIndex)
         
     session.close()
     return orderedList
