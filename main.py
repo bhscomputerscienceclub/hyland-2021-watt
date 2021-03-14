@@ -116,10 +116,9 @@ def leaderboard():
     print(leaderBoardInfo)
     for x in leaderBoardInfo:
         if x.differenceTime is not None:    
-            listOfNames.append(x.user)
-            listOfTimes.append(x.differenceTime)
+            listOfNames.append(x.user, x.differenceTime,x.differenceTime /x.numItems)
         numberOfTimes = len(listOfTimes)
-    orderedList = sorted(zip(listOfNames, listOfTimes), key = lambda x: x[1])
+    orderedList = sorted(zip(listOfNames, listOfTimes), key = lambda x: x[2])
         
         
     session.close()
