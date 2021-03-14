@@ -3,6 +3,7 @@ import 'package:hyland_2021_watt/data.dart';
 import 'package:hyland_2021_watt/db/db.dart';
 import 'db/database.dart';
 import 'listpage.dart';
+import 'leaderboard.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(title: 'home'),
         '/list': (context) => MyListPage(
             int.parse(ModalRoute.of(context)!.settings.arguments.toString())),
+        '/leaderboard': (context) => MyLeaderboardPage(),
       },
     );
   }
@@ -152,12 +154,50 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(8),
         children: tiles,
       )),
+      drawer: buildDrawer(context),
       floatingActionButton: FloatingActionButton(
         onPressed: addList,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  buildDrawer(BuildContext context) {
+    return Drawer(
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+          child: Text(
+            'SuperShopper',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: Icon(Icons.bar_chart),
+          title: Text('Leaderboard'),
+          onTap: () => Navigator.pushNamed(
+            context,
+            '/leaderboard',
+          ),
+        ),
+        ListTile(
+          leading: Icon(Icons.account_circle),
+          title: Text('Profile'),
+        ),
+        ListTile(
+          leading: Icon(Icons.settings),
+          title: Text('Settings'),
+        ),
+      ],
+    ));
   }
 
   List<Widget> createListView(List<ShoppingList> lists) {

@@ -1,5 +1,6 @@
 import 'package:hyland_2021_watt/db/database.dart';
 import 'package:hyland_2021_watt/db/db.dart';
+import 'package:hyland_2021_watt/remote.dart';
 
 late _DataHandler dataHandler;
 
@@ -10,10 +11,12 @@ void create(AppDatabase a) {
 class _DataHandler {
   late ShoppingListDao _lists;
   late ShoppingListItemDao _items;
+  late Remote remote;
 
   _DataHandler(AppDatabase a) {
     _lists = a.listsDao;
     _items = a.listItemsDao;
+    remote = Remote("yueyu", "doubleu", "http://10.13.13.4:8000");
   }
 
   Stream<List<ShoppingList>> get shoppingLists => (_lists.findAllLists())
@@ -59,5 +62,12 @@ class _DataHandler {
     ls[0]!.done++;
     _lists.updateList(ls[0]!);
     await _items.updateItem(it);
+
+    if (ls[0]!.done == 1) {
+//was first item make request for thingthing
+      int its = (await getItemsByListID(it.listID)).length;
+      remote.createList(its, it.listID);
+    }
+    remote.createItem(it.listID, it.id, it.barcode!);
   }
 }
