@@ -116,13 +116,13 @@ def leaderboard():
     print(leaderBoardInfo)
     for x in leaderBoardInfo:
         if x.differenceTime is not None:    
-            listOfNames.append(x.user, x.differenceTime,x.differenceTime /x.numItems)
+            listOfNames.append((x.user, x.differenceTime,x.differenceTime /x.numItems))
         numberOfTimes = len(listOfTimes)
-    orderedList = sorted(zip(listOfNames, listOfTimes), key = lambda x: x[2])
+    orderedList = sorted(listOfNames, key = lambda x: x[2])
         
         
     session.close()
-    return orderedList
+    return [[i[0],i[2]] for i in orderedList[:7]] # top 7
 # session = Session()
 # ans = session.query(Item).filter(Item.itemId == 33).all()
 # session.close()
