@@ -47,6 +47,7 @@ class ShoppingList(Base):
     __tablename__ = "ShoppingList"
     numItems = Column(Integer)
     bought = relationship("Item")
+    
     completionTime = Column(Integer)
     listId = Column(Integer, primary_key=True)
     user = Column(Integer, ForeignKey('Users.username'), primary_key=True)

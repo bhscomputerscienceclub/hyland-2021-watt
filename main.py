@@ -83,7 +83,39 @@ def read_item(shopping: UserResp):
     session.close()
     return
 
+@app.get("/users/shoppinglists")
+def read_list(shopListId: int):
+    session = Session()
+    listinfo = session.query(ShoppingList).filter(ShoppingList.listId == shopListId).all()
+    session.close()
+    return listinfo
 
+@app.get("/users/shoppinglists/{shoppingListId}/items")
+def read_items(itemId: int):
+    session = Session()
+    itemInfo = session.query(Item).filter(Item.itemId == itemId).all()
+    session.close()
+    return itemInfo
+
+@app.get("/leaderboard")
+def leaderboard():
+    session = Session()
+    leaderBoardInfo = session.query(ShoppingList).all()
+    listOfNames = []
+    listOfTimes = []
+    orderedList = []
+    for x in leaderBoardInfo:
+        listOfNames.append(x.user)
+        listOfTimes.append(x.completionTime)
+        numberOfTimes = len(listOfTimes)
+    for i in range(0, numberOfTimes):
+        minimumIndex = listOfTimes.index(min(listOfTimes))
+        listOfTimes.pop(minimumIndex)
+        orderedList.append(listOfNames[minimumIndex])
+        listOfNames.pop(minimumIndex)
+        
+    session.close()
+    return orderedList
 # session = Session()
 # ans = session.query(Item).filter(Item.itemId == 33).all()
 # session.close()
