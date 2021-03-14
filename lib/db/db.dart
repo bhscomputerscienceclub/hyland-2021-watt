@@ -1,49 +1,57 @@
 import 'package:floor/floor.dart';
 
-@entity
-class Person {
-  @primaryKey
-  final int id;
-
-  final String name;
-
-  Person(this.id, this.name);
-}
-
-@Entity()
+@Entity(primaryKeys: ["id"])
 class ShoppingList {
-  @primaryKey
   final int id;
 
   final int? time;
 
-  int get numAlreadyItems => 2;
+  int count;
+  int done;
 
-  int get numTodoItems => 2;
-
-  ShoppingList(this.id, this.time);
+  ShoppingList(this.id, this.time, {this.count = 0, this.done = 0});
 }
 
 @dao
 abstract class ShoppingListDao {
+  @Query("SELECT * FROM ShoppingList WHERE id = :id LIMIT 1")
+  Future<List<ShoppingList?>> findListByID(int id);
+
   @Query("SELECT * FROM ShoppingList")
-  Future<List<ShoppingList?>> findAllLists();
+  Stream<List<ShoppingList?>> findAllLists();
+
+  @update
+  Future<int> updateList(ShoppingList list);
 
   @insert
-  Future<void> insertList(ShoppingList list);
+  Future<int> ins(ShoppingList l);
+
+  @delete
+  Future<int> del(ShoppingList l);
 }
 
-@Entity(primaryKeys: ["listID", "id"])
+@Entity(primaryKeys: [
+  "listID",
+  "id"
+], foreignKeys: [
+  ForeignKey(
+    childColumns: ['listID'],
+    parentColumns: ['id'],
+    entity: ShoppingList,
+    onDelete: ForeignKeyAction.cascade,
+  ),
+])
 class ShoppingListItem {
   final int listID;
   final int id;
 
   final String desc;
 
-  int? barcode;
-  int? time;
+  String? barcode;
+  int time;
 
-  ShoppingListItem(this.listID, this.id, this.desc);
+  ShoppingListItem(this.listID, this.id, this.desc,
+      {this.barcode = null, this.time = 0});
 }
 
 @dao
@@ -51,12 +59,24 @@ abstract class ShoppingListItemDao {
   @Query('SELECT * FROM ShoppingListItem WHERE listID = :listID')
   Future<List<ShoppingListItem?>> findAllInList(int listID);
 
+  @Query('SELECT * FROM ShoppingListItem WHERE listID = :listID')
+  Stream<List<ShoppingListItem>?> getItemsStreamByListID(int listID);
+
   Future<int> findCountInList(int listID) async =>
-      (await findAllInList(1)).length;
+      (await findAllInList(listID)).length;
+
+  Future<int> findCompletedInList(int listID) async {
+    final list = await findAllInList(listID);
+    list.remove((value) => value.barcode == null);
+    return list.length;
+  }
 
   @insert
-  Future<void> insertItem(ShoppingListItem item);
+  Future<int> insertItem(ShoppingListItem item);
 
   @update
-  Future<void> updateItem(ShoppingListItem item);
+  Future<int> updateItem(ShoppingListItem item);
+
+  @delete
+  Future<int> deleteItem(ShoppingListItem item);
 }

@@ -9,7 +9,7 @@ import 'db.dart';
 
 part 'database.g.dart'; // the generated code will be there
 
-@Database(version: 1, entities: [ShoppingListItem])
+@Database(version: 1, entities: [ShoppingListItem, ShoppingList])
 abstract class AppDatabase extends FloorDatabase {
   ShoppingListItemDao get listItemsDao;
   ShoppingListDao get listsDao;

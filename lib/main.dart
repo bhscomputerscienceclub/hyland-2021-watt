@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hyland_2021_watt/data.dart';
 import 'package:hyland_2021_watt/db/db.dart';
 import 'db/database.dart';
+import 'listpage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final database =
-      await $FloorAppDatabase.databaseBuilder('flutter_database.db').build();
+      await $FloorAppDatabase.databaseBuilder('flutter_database1.db').build();
   create(database);
 
   runApp(MyApp());
@@ -35,7 +36,12 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(title: 'home'),
+        '/list': (context) => MyListPage(
+            int.parse(ModalRoute.of(context)!.settings.arguments.toString())),
+      },
     );
   }
 }
@@ -62,44 +68,113 @@ class _MyHomePageState extends State<MyHomePage> {
   List<ShoppingList> lists = [];
 
   void initState() {
-    init();
+    super.initState();
+    listsSync();
   }
 
-  void init() async {
-    lists = await dataHandler.shoppingLists;
+  void listsSync() async {
+    await for (var ls in dataHandler.shoppingLists) {
+      setState(() {
+        lists = ls;
+      });
+    }
   }
 
-  void _incrementCounter() async {}
+  void addList() async {
+    final ls = ShoppingList(DateTime.now().millisecondsSinceEpoch, null);
+    await dataHandler.newList(ls);
+  }
+
+  void delList(int id) async {
+    await dataHandler.deleteListByID(id);
+  }
+
+  void listTap(int id, BuildContext c) {}
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    List<Widget> tiles = [];
+    var ongoingList = lists.toList();
+    ongoingList.retainWhere((l) => (l.done < l.count && l.done != 0));
+    var incompleteList = lists.toList();
+    incompleteList.retainWhere((element) => element.done == 0);
+    var completeList = lists.toList();
+    completeList.retainWhere(
+        (element) => element.done == element.count && element.count != 0);
+
+    if (ongoingList.length > 0)
+      tiles.add(Center(
+          child: Text(
+        "Ongoing Challenges",
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 22,
+        ),
+      )));
+    tiles += createListView(ongoingList);
+    if (incompleteList.length > 0)
+      tiles.add(Center(
+          child: Text(
+        "Not Started",
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 22,
+        ),
+      )));
+    tiles += createListView(incompleteList);
+    if (completeList.length > 0)
+      tiles.add(Center(
+          child: Text(
+        "Completed",
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 22,
+        ),
+      )));
+    tiles += createListView(completeList);
+
+    if (tiles.length == 0)
+      tiles.add(Center(
+          child: Text(
+        "Add new lists using the plus button",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      )));
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
           child: ListView(
         padding: const EdgeInsets.all(8),
-        children: lists
-            .map(
-              (e) => Card(
-                  child: ListTile(title: Text(e.id.toString()), dense: true)),
-            )
-            .toList(),
+        children: tiles,
       )),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: addList,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  List<Widget> createListView(List<ShoppingList> lists) {
+    return lists
+        .map(
+          (e) => Card(
+              child: ListTile(
+            title: Text("List ${e.id.toString()} - ${e.count} items"),
+            trailing: IconButton(
+                icon: Icon(Icons.delete), onPressed: () => delList(e.id)),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/list',
+              arguments: e.id,
+            ),
+          )),
+        )
+        .toList();
   }
 }
