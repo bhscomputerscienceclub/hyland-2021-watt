@@ -4,6 +4,7 @@ import 'package:hyland_2021_watt/db/db.dart';
 import 'db/database.dart';
 import 'listpage.dart';
 import 'leaderboard.dart';
+import 'tips.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/list': (context) => MyListPage(
             int.parse(ModalRoute.of(context)!.settings.arguments.toString())),
         '/leaderboard': (context) => MyLeaderboardPage(),
+        '/tips': (context) => Tips(),
       },
     );
   }
@@ -189,12 +191,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         ListTile(
-          leading: Icon(Icons.account_circle),
-          title: Text('Profile'),
-        ),
+            leading: Icon(Icons.info),
+            title: Text('Tips'),
+            onTap: () => Navigator.pushNamed(
+                  context,
+                  '/leaderboard',
+                )),
         ListTile(
           leading: Icon(Icons.settings),
           title: Text('Settings'),
+          onTap: () {
+            print("aa");
+          },
         ),
       ],
     ));

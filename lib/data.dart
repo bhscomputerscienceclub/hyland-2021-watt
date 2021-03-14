@@ -16,7 +16,7 @@ class _DataHandler {
   _DataHandler(AppDatabase a) {
     _lists = a.listsDao;
     _items = a.listItemsDao;
-    remote = Remote("yueyu", "doubleu", "http://10.13.13.4:8000");
+    remote = Remote("yueyu", "doubleu", "http://10.13.13.2:8000");
   }
 
   Stream<List<ShoppingList>> get shoppingLists => (_lists.findAllLists())

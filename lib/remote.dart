@@ -52,11 +52,14 @@ class Remote {
   }
 
   Future<List<Tuple2<String, int>>> getLeaderboard() async {
+    print(baseurl + '/leaderboard');
     var resp =
         await http.get(Uri.parse(baseurl + '/leaderboard'), headers: headers);
     print(resp.body);
     var stuff = json.decode(resp.body) as List<dynamic>;
-    var stuff2 = stuff.cast<List<dynamic>>().cast<Tuple2<String, int>>();
-    return stuff2;
+    var stuff2 = stuff.cast<List<dynamic>>();
+    List<Tuple2<String, int>> stuff3 =
+        stuff2.map((v) => Tuple2(v[0] as String, v[1] as int)).toList();
+    return stuff3;
   }
 }
